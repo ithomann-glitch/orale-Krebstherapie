@@ -125,6 +125,74 @@
     showStep(prev);
   });
 
+  /* ---------- Themen-Karussell ---------- */
+  // The track scrolls natively (swipe / trackpad / keyboard); arrows and
+  // dots just scroll it to a snap position. Dots represent "pages" of as
+  // many cards as currently fit, so their count adapts to the viewport.
+  var topicTrack = document.getElementById('topic-track');
+  if (topicTrack) {
+    var topicCards = Array.prototype.slice.call(topicTrack.children);
+    var topicPrev = document.getElementById('topic-prev');
+    var topicNext = document.getElementById('topic-next');
+    var topicDots = document.getElementById('topic-dots');
+
+    var cardStep = function () {
+      if (topicCards.length < 2) return topicTrack.clientWidth;
+      return topicCards[1].offsetLeft - topicCards[0].offsetLeft;
+    };
+    var perView = function () {
+      var gap = parseFloat(getComputedStyle(topicTrack).columnGap) || 0;
+      return Math.max(1, Math.floor((topicTrack.clientWidth + gap + 4) / cardStep()));
+    };
+    var pageCount = function () {
+      return Math.max(1, topicCards.length - perView() + 1);
+    };
+    var currentIndex = function () {
+      // The last page can't always scroll a full step (partial cards on
+      // small screens), so treat "scrolled to the end" as the last page.
+      if (topicTrack.scrollLeft >= topicTrack.scrollWidth - topicTrack.clientWidth - 2) return pageCount() - 1;
+      return Math.round(topicTrack.scrollLeft / cardStep());
+    };
+    var goTo = function (index) {
+      var max = pageCount() - 1;
+      index = Math.max(0, Math.min(index, max));
+      topicTrack.scrollTo({ left: index * cardStep() });
+    };
+
+    var renderDots = function () {
+      topicDots.innerHTML = '';
+      for (var i = 0; i < pageCount(); i++) {
+        var dot = document.createElement('button');
+        dot.type = 'button';
+        dot.className = 'topic-dot';
+        dot.setAttribute('aria-label', 'Zu Thema ' + (i + 1));
+        dot.addEventListener('click', goTo.bind(null, i));
+        topicDots.appendChild(dot);
+      }
+    };
+    var updateTopicState = function () {
+      var idx = currentIndex();
+      var max = pageCount() - 1;
+      topicPrev.disabled = idx <= 0;
+      topicNext.disabled = idx >= max;
+      Array.prototype.forEach.call(topicDots.children, function (dot, i) {
+        dot.classList.toggle('is-active', i === Math.min(idx, max));
+      });
+    };
+
+    topicPrev.addEventListener('click', function () { goTo(currentIndex() - 1); });
+    topicNext.addEventListener('click', function () { goTo(currentIndex() + 1); });
+    var topicTicking = false;
+    topicTrack.addEventListener('scroll', function () {
+      if (topicTicking) return;
+      topicTicking = true;
+      requestAnimationFrame(function () { updateTopicState(); topicTicking = false; });
+    }, { passive: true });
+    window.addEventListener('resize', function () { renderDots(); updateTopicState(); });
+    renderDots();
+    updateTopicState();
+  }
+
   /* ---------- Rotating question headline in the problem section ---------- */
   var problemSlider = document.getElementById('problem-slider');
   var reducedMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
