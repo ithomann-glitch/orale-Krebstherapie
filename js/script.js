@@ -130,10 +130,10 @@
   var reducedMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   if (problemSlider && !reducedMotion) {
     var sliderQuestions = [
-      'Ist diese Übelkeit noch normal?',
-      'Woher kommt der Durchfall?',
-      'Wann muss ich die Praxis anrufen?',
-      'Liegt es vielleicht an der Einnahme?'
+      'Liegt es vielleicht an der Einnahme?',
+      'Verträgt sich das mit meinen anderen Tabletten?',
+      'Darf ich Vitamintabletten dazu nehmen?',
+      'Was, wenn ich eine Dosis vergessen habe?'
     ];
     var sliderIndex = 0;
     setInterval(function () {
