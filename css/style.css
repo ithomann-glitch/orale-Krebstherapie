@@ -184,7 +184,7 @@ img { max-width: 100%; display: block; }
 .nav-toggle[aria-expanded="true"] span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
 
 /* ---------- Site navigation (scrollspy) ---------- */
-/* Desktop (>=900px): plain inline nav in the header, active section underlined in red. */
+/* Desktop (>=1080px): plain inline nav in the header, active section underlined in red. */
 .site-nav {
   display: flex;
   align-items: center;
@@ -195,6 +195,7 @@ img { max-width: 100%; display: block; }
   color: var(--schiefer);
   font-weight: 600;
   font-size: .95rem;
+  white-space: nowrap;
   padding: 4px 2px;
   border-bottom: 2px solid transparent;
   transition: color .2s ease, border-color .2s ease;
@@ -202,8 +203,16 @@ img { max-width: 100%; display: block; }
 .site-nav a:hover { color: var(--erdbeere); }
 .site-nav a.is-active { color: var(--erdbeere); border-bottom-color: var(--erdbeere); }
 
-/* Mobile (<900px): hamburger opens a simple full-screen menu. */
-@media (max-width: 899px) {
+@media (min-width: 1080px) { .header-actions .btn { white-space: nowrap; } }
+/* Mid widths: keep the header on one line by shrinking the phone link to
+   its icon and tightening the nav spacing. */
+@media (min-width: 1080px) and (max-width: 1299px) {
+  .site-nav { gap: 18px; margin-left: 16px; }
+  .header-phone span { display: none; }
+}
+
+/* Mobile (<1080px): hamburger opens a simple full-screen menu. */
+@media (max-width: 1079px) {
   .nav-toggle { display: flex; }
 
   .site-nav {
@@ -308,7 +317,7 @@ img { max-width: 100%; display: block; }
   padding: 20px clamp(24px, 4vw, 40px);
   box-shadow: 0 10px 24px -8px rgba(44, 46, 43, .25);
 }
-.hero-copy h1 { font-size: clamp(1.6rem, 2.6vw, 2.1rem); margin-bottom: .35em; }
+.hero-copy h1 { font-size: clamp(1.6rem, 2.6vw, 2.1rem); margin-bottom: .35em; max-width: 22em; }
 .hero-sub { font-size: 1rem; margin-bottom: .6em; }
 .hero-actions { display: flex; flex-wrap: wrap; gap: 14px; margin: 16px 0 14px; }
 .hero-trust {
@@ -924,7 +933,8 @@ a.contact-card:hover { box-shadow: var(--shadow-hover); transform: translateY(-3
 .footer-legal a:hover { color: var(--avocado); text-decoration: underline; }
 
 @media (max-width: 760px) {
-  .footer-grid { grid-template-columns: 1fr 1fr; gap: 28px 24px; }
+  .footer-grid { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 28px 24px; }
+  .footer-contact { overflow-wrap: anywhere; }
   .footer-bottom { flex-direction: column; align-items: flex-start; }
 }
 
