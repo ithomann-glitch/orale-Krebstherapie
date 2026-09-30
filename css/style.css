@@ -543,6 +543,25 @@ img { max-width: 100%; display: block; }
 }
 .zg-card p:last-child { font-size: .92rem; margin-bottom: 0; }
 
+.vertrauen-lead { font-size: .95rem; margin-bottom: 14px; }
+
+.contact-person {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  max-width: 780px;
+  margin: 24px auto 0;
+  padding: 16px 20px;
+  background: #fff;
+  border-radius: var(--radius-m);
+  box-shadow: var(--shadow-card);
+  text-align: left;
+}
+.contact-person .icon-scribble-md { width: 34px; height: 34px; flex-shrink: 0; }
+.contact-person p { margin: 0; font-size: .92rem !important; }
+.contact-person a { font-weight: 700; overflow-wrap: anywhere; }
+.branch-result-badge.branch-result-badge-onko { background: var(--erdbeere); }
+
 /* ---------- Anspruchscheck ---------- */
 /* This is the page's central conversion tool, so it gets a distinct
    background (breaks the white/morgentau alternation of neighboring

@@ -237,7 +237,7 @@
   var branchForm = document.getElementById('branch-finder-form');
   if (branchForm) {
     var branches = [
-      { name: 'sk-Apotheke im Einkaufspark Duckwitz', address: 'Duckwitzstraße 55, 28199 Bremen', plz: 28199 },
+      { name: 'sk-Apotheke im Einkaufspark Duckwitz', address: 'Duckwitzstraße 55, 28199 Bremen', plz: 28199, oncology: true },
       { name: 'sk-Apotheke Pappelstraße', address: 'Pappelstraße 53-57, 28199 Bremen', plz: 28199 },
       { name: 'sk-Apotheke Victoria in Huchting', address: 'Kirchhuchtinger Landstraße 80, 28259 Bremen', plz: 28259 },
       { name: 'sk-Apotheke in Varrel', address: 'Im Graftwinkel 2, 28816 Stuhr', plz: 28816 }
@@ -262,6 +262,7 @@
           '<div class="branch-result-title">' +
           '<span class="branch-result-name">' + branch.name + '</span>' +
           (i === 0 ? '<span class="branch-result-badge">Nächstgelegene Filiale</span>' : '') +
+          (branch.oncology ? '<span class="branch-result-badge branch-result-badge-onko">Schwerpunkt Onkologie</span>' : '') +
           '</div>' +
           '<div class="branch-result-address">' + branch.address + '</div>' +
           '</div>' +
