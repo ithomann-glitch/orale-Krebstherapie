@@ -131,9 +131,9 @@
   if (problemSlider && !reducedMotion) {
     var sliderQuestions = [
       'Ist diese Übelkeit noch normal?',
-      'Was hilft gegen den Durchfall?',
+      'Woher kommt der Durchfall?',
       'Wann muss ich die Praxis anrufen?',
-      'Wie kann ich als Angehörige:r helfen?'
+      'Liegt es vielleicht an der Einnahme?'
     ];
     var sliderIndex = 0;
     setInterval(function () {

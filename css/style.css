@@ -424,6 +424,7 @@ img { max-width: 100%; display: block; }
   margin: 14px 0 4px !important;
 }
 .nw-label-warn { color: var(--erdbeere) !important; }
+.nw-label-neutral { color: var(--schiefer) !important; }
 .leistung-detail ul { margin: 0; padding-left: 18px; font-size: .88rem; color: var(--schiefer); }
 .leistung-detail li { margin-bottom: 4px; }
 .nw-label + p { margin-top: 0 !important; }
