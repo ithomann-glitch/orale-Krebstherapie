@@ -61,7 +61,7 @@
       var expanded = btn.getAttribute('aria-expanded') === 'true';
       var detail = btn.nextElementSibling;
       btn.setAttribute('aria-expanded', String(!expanded));
-      btn.firstChild.textContent = expanded ? 'Mehr erfahren' : 'Weniger anzeigen';
+      btn.firstChild.textContent = expanded ? (btn.getAttribute('data-label') || 'Mehr erfahren') : 'Weniger anzeigen';
       detail.style.maxHeight = expanded ? null : detail.scrollHeight + 'px';
     });
   });
@@ -93,6 +93,15 @@
       var value = btn.getAttribute('data-value');
       answers[step] = value;
 
+      // Step 1 asks who the check is for; switch the wording of all
+      // following questions and results to match ("Ihnen" vs. "Ihrem
+      // Angehörigen").
+      if (step === '1') {
+        widget.querySelectorAll('[data-selbst]').forEach(function (el) {
+          el.textContent = el.getAttribute(value === 'angehoerige' ? 'data-angehoerige' : 'data-selbst');
+        });
+      }
+
       if (value === 'no') {
         history.push('result-no');
         showStep('result-no');
@@ -121,10 +130,10 @@
   var reducedMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   if (problemSlider && !reducedMotion) {
     var sliderQuestions = [
-      'Mache ich alles richtig?',
-      'Vor oder nach dem Essen?',
-      'Ist das eine Nebenwirkung?',
-      'Darf ich das zusätzlich nehmen?'
+      'Ist diese Übelkeit noch normal?',
+      'Was hilft gegen den Durchfall?',
+      'Wann muss ich die Praxis anrufen?',
+      'Wie kann ich als Angehörige:r helfen?'
     ];
     var sliderIndex = 0;
     setInterval(function () {
