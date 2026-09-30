@@ -121,10 +121,10 @@
   var reducedMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   if (problemSlider && !reducedMotion) {
     var sliderQuestions = [
-      'Verträgt sich das eigentlich alles?',
-      'Wurde etwas doppelt verordnet?',
-      'Woher kommt die Müdigkeit?',
-      'Wer hat noch den Überblick?'
+      'Mache ich alles richtig?',
+      'Vor oder nach dem Essen?',
+      'Ist das eine Nebenwirkung?',
+      'Darf ich das zusätzlich nehmen?'
     ];
     var sliderIndex = 0;
     setInterval(function () {
