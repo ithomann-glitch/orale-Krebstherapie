@@ -503,40 +503,6 @@ img { max-width: 100%; display: block; }
 .warn-box-footer a { color: var(--erdbeere); }
 .warn-box-note { font-size: .82rem; color: var(--schiefer); margin: 0; }
 
-/* ---------- Angehörige: Alltagstipps ---------- */
-.care-box {
-  max-width: 840px;
-  margin: 28px auto 0;
-  background: #fff;
-  border-radius: var(--radius-m);
-  box-shadow: var(--shadow-card);
-  padding: 30px 32px;
-}
-.care-box h3 { font-size: 1.25rem; margin-bottom: 16px; }
-.care-list {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 14px 28px;
-}
-.care-list li { position: relative; padding-left: 24px; font-size: .92rem; }
-.care-list li::before { content: "✓"; position: absolute; left: 0; color: var(--erdbeere); font-weight: 800; }
-.care-list strong { color: var(--heading); }
-.care-self {
-  display: flex;
-  gap: 14px;
-  align-items: flex-start;
-  margin-top: 22px;
-  padding: 18px 20px;
-  background: var(--morgentau);
-  border-radius: var(--radius-s);
-}
-.care-self .icon-scribble-md { width: 30px; height: 30px; flex-shrink: 0; }
-.care-self p { margin: 0; font-size: .9rem; }
-.care-self a { font-weight: 700; white-space: nowrap; }
-
 /* ---------- Zielgruppen ---------- */
 .zielgruppen { background: var(--morgentau); }
 .zielgruppen-grid {
@@ -551,6 +517,8 @@ img { max-width: 100%; display: block; }
   border-radius: var(--radius-m);
   overflow: hidden;
   box-shadow: var(--shadow-card);
+  display: flex;
+  flex-direction: column;
 }
 .zg-media { position: relative; }
 .zg-photo {
@@ -572,14 +540,24 @@ img { max-width: 100%; display: block; }
   border-radius: 999px;
 }
 .zg-badge .icon-scribble-sm { width: 16px; height: 16px; }
-.zg-card-body { padding: 24px; }
+.zg-card-body { padding: 24px; flex: 1; display: flex; flex-direction: column; }
 .zg-quote {
   color: var(--erdbeere);
   font-weight: 700;
   font-size: .9rem;
   margin-bottom: 12px;
 }
-.zg-card p:last-child { font-size: .92rem; margin-bottom: 0; }
+.zg-card-body > p:not(.zg-quote) { font-size: .92rem; margin-bottom: 0; }
+.zg-actions {
+  margin-top: auto;
+  padding-top: 20px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px 18px;
+}
+.zg-phone { display: inline-flex; align-items: center; gap: 6px; font-weight: 700; color: var(--avocado); white-space: nowrap; }
+.zg-phone:hover { color: var(--erdbeere); }
 
 .vertrauen-lead { font-size: .95rem; margin-bottom: 14px; }
 
@@ -1009,8 +987,8 @@ a.contact-card:hover { box-shadow: var(--shadow-hover); transform: translateY(-3
 @media (max-width: 760px) {
   .leistung-grid { grid-template-columns: 1fr; }
   .topic-track { --topic-per-view: 1.15; --topic-gap: 14px; }
-  .warn-list, .care-list { grid-template-columns: 1fr; }
-  .warn-box, .care-box { padding: 22px 20px; }
+  .warn-list { grid-template-columns: 1fr; }
+  .warn-box { padding: 22px 20px; }
   .vertrauen-facts { grid-template-columns: 1fr; }
   .steps { grid-template-columns: 1fr; }
   .form-row-half { grid-template-columns: 1fr; }
