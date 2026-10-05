@@ -132,7 +132,7 @@
   // Movement stops while the pointer hovers the slider, while it has
   // keyboard focus, while it is dragged, while it is off screen and while
   // the tab is hidden; with prefers-reduced-motion it never drifts on its
-  // own (arrows and dragging still work).
+  // own (dragging and the arrow keys still work).
   var topicTrack = document.getElementById('topic-track');
   var topicRail = document.getElementById('topic-rail');
   if (topicTrack && topicRail) {
@@ -150,7 +150,7 @@
     var focusPause = false;
     var visible = true;
     var dragging = false;
-    var glide = null; // running arrow animation {from, to, start}
+    var glide = null; // running arrow-key animation {from, to, start}
     var drift = !(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
 
     var loopWidth = function () {
@@ -188,13 +188,11 @@
 
     var glideBy = function (dir) {
       // Snap to the next/previous card edge rather than a fixed distance,
-      // so cards line up neatly after an arrow click.
+      // so cards line up neatly after an arrow-key press.
       var step = stepWidth();
       var target = dir > 0 ? (Math.floor(offset / step) + 1) * step : (Math.ceil(offset / step) - 1) * step;
       glide = { from: offset, to: target, start: performance.now() };
     };
-    document.getElementById('topic-prev').addEventListener('click', function () { glideBy(-1); });
-    document.getElementById('topic-next').addEventListener('click', function () { glideBy(1); });
     topicTrack.addEventListener('keydown', function (e) {
       if (e.key === 'ArrowRight') { glideBy(1); e.preventDefault(); }
       if (e.key === 'ArrowLeft') { glideBy(-1); e.preventDefault(); }
