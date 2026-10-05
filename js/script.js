@@ -166,7 +166,7 @@
         dot.type = 'button';
         dot.className = 'topic-dot';
         dot.setAttribute('aria-label', 'Zu Thema ' + (i + 1));
-        dot.addEventListener('click', goTo.bind(null, i));
+        dot.addEventListener('click', function (index) { goTo(index); restartAutoplay(); }.bind(null, i));
         topicDots.appendChild(dot);
       }
     };
@@ -180,8 +180,40 @@
       });
     };
 
-    topicPrev.addEventListener('click', function () { goTo(currentIndex() - 1); });
-    topicNext.addEventListener('click', function () { goTo(currentIndex() + 1); });
+    topicPrev.addEventListener('click', function () { goTo(currentIndex() - 1); restartAutoplay(); });
+    topicNext.addEventListener('click', function () { goTo(currentIndex() + 1); restartAutoplay(); });
+
+    // Autoplay: advance one card every few seconds and wrap around at the
+    // end. Paused while the pointer is over the slider, while it has
+    // keyboard focus, while a finger is on it and while the tab is hidden;
+    // disabled entirely for users who prefer reduced motion.
+    var topicSlider = document.getElementById('topic-slider');
+    var autoplayDelay = 4500;
+    var autoplayTimer = null;
+    var autoplayPaused = false;
+    var autoplayEnabled = !(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+
+    var advance = function () {
+      if (autoplayPaused || document.hidden) return;
+      var idx = currentIndex();
+      goTo(idx >= pageCount() - 1 ? 0 : idx + 1);
+    };
+    var restartAutoplay = function () {
+      if (!autoplayEnabled) return;
+      clearInterval(autoplayTimer);
+      autoplayTimer = setInterval(advance, autoplayDelay);
+    };
+    var pauseAutoplay = function () { autoplayPaused = true; };
+    var resumeAutoplay = function () { autoplayPaused = false; restartAutoplay(); };
+
+    topicSlider.addEventListener('mouseenter', pauseAutoplay);
+    topicSlider.addEventListener('mouseleave', resumeAutoplay);
+    topicSlider.addEventListener('focusin', pauseAutoplay);
+    topicSlider.addEventListener('focusout', function (e) {
+      if (!topicSlider.contains(e.relatedTarget)) resumeAutoplay();
+    });
+    topicSlider.addEventListener('touchstart', pauseAutoplay, { passive: true });
+    topicSlider.addEventListener('touchend', resumeAutoplay, { passive: true });
     var topicTicking = false;
     topicTrack.addEventListener('scroll', function () {
       if (topicTicking) return;
@@ -191,6 +223,7 @@
     window.addEventListener('resize', function () { renderDots(); updateTopicState(); });
     renderDots();
     updateTopicState();
+    restartAutoplay();
   }
 
   /* ---------- Rotating question headline in the problem section ---------- */
