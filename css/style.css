@@ -412,30 +412,34 @@ img { max-width: 100%; display: block; }
 .leistung-detail p { font-size: .88rem; color: var(--schiefer); margin: 12px 0 0; }
 
 /* ---------- Nebenwirkungen ---------- */
-/* Themen-Karussell: native horizontal scrolling with scroll-snap, so swipe
-   works on touch devices without a library; arrows and dots are added
-   on top by script.js. */
+/* Themen-Karussell: the rail drifts continuously to the left (endless
+   loop via cloned cards, driven by script.js) and stops on hover. Arrows
+   and drag/swipe move it manually. */
 .topic-slider { position: relative; }
 .topic-track {
   --topic-gap: 20px;
   --topic-per-view: 3;
+  overflow: hidden;
+  padding: 4px 2px 12px;
+  touch-action: pan-y;
+  cursor: grab;
+  -webkit-mask-image: linear-gradient(to right, transparent, #000 48px, #000 calc(100% - 48px), transparent);
+  mask-image: linear-gradient(to right, transparent, #000 48px, #000 calc(100% - 48px), transparent);
+}
+.topic-track.is-dragging { cursor: grabbing; }
+.topic-track:focus-visible { outline: 2px solid var(--avocado); outline-offset: 4px; border-radius: var(--radius-m); }
+.topic-rail {
   display: flex;
   gap: var(--topic-gap);
-  overflow-x: auto;
-  scroll-snap-type: x mandatory;
-  scroll-behavior: smooth;
-  scrollbar-width: none;
-  padding: 4px 2px 12px;
+  will-change: transform;
 }
-.topic-track::-webkit-scrollbar { display: none; }
-.topic-track:focus-visible { outline: 2px solid var(--avocado); outline-offset: 4px; border-radius: var(--radius-m); }
 .topic-card {
   flex: 0 0 calc((100% - (var(--topic-per-view) - 1) * var(--topic-gap)) / var(--topic-per-view));
-  scroll-snap-align: start;
   background: var(--honigmelone);
   border-radius: var(--radius-m);
   padding: 22px 22px 20px;
   box-shadow: var(--shadow-card);
+  user-select: none;
 }
 .topic-card-head { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
 .topic-card-head .icon-scribble { width: 38px; height: 38px; flex-shrink: 0; }
@@ -456,17 +460,6 @@ img { max-width: 100%; display: block; }
   transition: background .15s ease, color .15s ease, opacity .15s ease;
 }
 .topic-arrow:hover:not(:disabled) { background: var(--avocado); color: #fff; }
-.topic-arrow:disabled { opacity: .35; cursor: default; }
-.topic-dots { display: flex; gap: 8px; }
-.topic-dot {
-  width: 10px; height: 10px;
-  border-radius: 50%;
-  border: none;
-  padding: 0;
-  background: #d5d8cf;
-  cursor: pointer;
-}
-.topic-dot.is-active { background: var(--erdbeere); }
 
 .warn-box {
   max-width: 980px;

@@ -125,105 +125,119 @@
     showStep(prev);
   });
 
-  /* ---------- Themen-Karussell ---------- */
-  // The track scrolls natively (swipe / trackpad / keyboard); arrows and
-  // dots just scroll it to a snap position. Dots represent "pages" of as
-  // many cards as currently fit, so their count adapts to the viewport.
+  /* ---------- Themen-Karussell (continuous) ---------- */
+  // The rail drifts slowly to the left in one continuous movement. The
+  // cards are cloned once so the loop is seamless: when the offset passes
+  // the width of the original set it wraps back by exactly that width.
+  // Movement stops while the pointer hovers the slider, while it has
+  // keyboard focus, while it is dragged, while it is off screen and while
+  // the tab is hidden; with prefers-reduced-motion it never drifts on its
+  // own (arrows and dragging still work).
   var topicTrack = document.getElementById('topic-track');
-  if (topicTrack) {
-    var topicCards = Array.prototype.slice.call(topicTrack.children);
-    var topicPrev = document.getElementById('topic-prev');
-    var topicNext = document.getElementById('topic-next');
-    var topicDots = document.getElementById('topic-dots');
-
-    var cardStep = function () {
-      if (topicCards.length < 2) return topicTrack.clientWidth;
-      return topicCards[1].offsetLeft - topicCards[0].offsetLeft;
-    };
-    var perView = function () {
-      var gap = parseFloat(getComputedStyle(topicTrack).columnGap) || 0;
-      return Math.max(1, Math.floor((topicTrack.clientWidth + gap + 4) / cardStep()));
-    };
-    var pageCount = function () {
-      return Math.max(1, topicCards.length - perView() + 1);
-    };
-    var currentIndex = function () {
-      // The last page can't always scroll a full step (partial cards on
-      // small screens), so treat "scrolled to the end" as the last page.
-      if (topicTrack.scrollLeft >= topicTrack.scrollWidth - topicTrack.clientWidth - 2) return pageCount() - 1;
-      return Math.round(topicTrack.scrollLeft / cardStep());
-    };
-    var goTo = function (index) {
-      var max = pageCount() - 1;
-      index = Math.max(0, Math.min(index, max));
-      topicTrack.scrollTo({ left: index * cardStep() });
-    };
-
-    var renderDots = function () {
-      topicDots.innerHTML = '';
-      for (var i = 0; i < pageCount(); i++) {
-        var dot = document.createElement('button');
-        dot.type = 'button';
-        dot.className = 'topic-dot';
-        dot.setAttribute('aria-label', 'Zu Thema ' + (i + 1));
-        dot.addEventListener('click', function (index) { goTo(index); restartAutoplay(); }.bind(null, i));
-        topicDots.appendChild(dot);
-      }
-    };
-    var updateTopicState = function () {
-      var idx = currentIndex();
-      var max = pageCount() - 1;
-      topicPrev.disabled = idx <= 0;
-      topicNext.disabled = idx >= max;
-      Array.prototype.forEach.call(topicDots.children, function (dot, i) {
-        dot.classList.toggle('is-active', i === Math.min(idx, max));
-      });
-    };
-
-    topicPrev.addEventListener('click', function () { goTo(currentIndex() - 1); restartAutoplay(); });
-    topicNext.addEventListener('click', function () { goTo(currentIndex() + 1); restartAutoplay(); });
-
-    // Autoplay: advance one card every few seconds and wrap around at the
-    // end. Paused while the pointer is over the slider, while it has
-    // keyboard focus, while a finger is on it and while the tab is hidden;
-    // disabled entirely for users who prefer reduced motion.
+  var topicRail = document.getElementById('topic-rail');
+  if (topicTrack && topicRail) {
     var topicSlider = document.getElementById('topic-slider');
-    var autoplayDelay = 4500;
-    var autoplayTimer = null;
-    var autoplayPaused = false;
-    var autoplayEnabled = !(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
-
-    var advance = function () {
-      if (autoplayPaused || document.hidden) return;
-      var idx = currentIndex();
-      goTo(idx >= pageCount() - 1 ? 0 : idx + 1);
-    };
-    var restartAutoplay = function () {
-      if (!autoplayEnabled) return;
-      clearInterval(autoplayTimer);
-      autoplayTimer = setInterval(advance, autoplayDelay);
-    };
-    var pauseAutoplay = function () { autoplayPaused = true; };
-    var resumeAutoplay = function () { autoplayPaused = false; restartAutoplay(); };
-
-    topicSlider.addEventListener('mouseenter', pauseAutoplay);
-    topicSlider.addEventListener('mouseleave', resumeAutoplay);
-    topicSlider.addEventListener('focusin', pauseAutoplay);
-    topicSlider.addEventListener('focusout', function (e) {
-      if (!topicSlider.contains(e.relatedTarget)) resumeAutoplay();
+    var originals = Array.prototype.slice.call(topicRail.children);
+    originals.forEach(function (card) {
+      var clone = card.cloneNode(true);
+      clone.setAttribute('aria-hidden', 'true');
+      topicRail.appendChild(clone);
     });
-    topicSlider.addEventListener('touchstart', pauseAutoplay, { passive: true });
-    topicSlider.addEventListener('touchend', resumeAutoplay, { passive: true });
-    var topicTicking = false;
-    topicTrack.addEventListener('scroll', function () {
-      if (topicTicking) return;
-      topicTicking = true;
-      requestAnimationFrame(function () { updateTopicState(); topicTicking = false; });
-    }, { passive: true });
-    window.addEventListener('resize', function () { renderDots(); updateTopicState(); });
-    renderDots();
-    updateTopicState();
-    restartAutoplay();
+
+    var speed = 28; // px per second
+    var offset = 0;
+    var hoverPause = false;
+    var focusPause = false;
+    var visible = true;
+    var dragging = false;
+    var glide = null; // running arrow animation {from, to, start}
+    var drift = !(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+
+    var loopWidth = function () {
+      return topicRail.children[originals.length].offsetLeft - originals[0].offsetLeft;
+    };
+    var stepWidth = function () {
+      return originals[1].offsetLeft - originals[0].offsetLeft;
+    };
+    var wrap = function (x) {
+      var w = loopWidth();
+      return w > 0 ? ((x % w) + w) % w : 0;
+    };
+    var render = function () {
+      topicRail.style.transform = 'translate3d(' + (-offset) + 'px,0,0)';
+    };
+
+    var last = null;
+    var frame = function (now) {
+      if (last === null) last = now;
+      var dt = Math.min((now - last) / 1000, 0.1);
+      last = now;
+      if (glide) {
+        var t = Math.min((now - glide.start) / 450, 1);
+        var eased = 1 - Math.pow(1 - t, 3);
+        offset = wrap(glide.from + (glide.to - glide.from) * eased);
+        if (t >= 1) glide = null;
+        render();
+      } else if (drift && !hoverPause && !focusPause && !dragging && visible && !document.hidden) {
+        offset = wrap(offset + speed * dt);
+        render();
+      }
+      requestAnimationFrame(frame);
+    };
+    requestAnimationFrame(frame);
+
+    var glideBy = function (dir) {
+      // Snap to the next/previous card edge rather than a fixed distance,
+      // so cards line up neatly after an arrow click.
+      var step = stepWidth();
+      var target = dir > 0 ? (Math.floor(offset / step) + 1) * step : (Math.ceil(offset / step) - 1) * step;
+      glide = { from: offset, to: target, start: performance.now() };
+    };
+    document.getElementById('topic-prev').addEventListener('click', function () { glideBy(-1); });
+    document.getElementById('topic-next').addEventListener('click', function () { glideBy(1); });
+    topicTrack.addEventListener('keydown', function (e) {
+      if (e.key === 'ArrowRight') { glideBy(1); e.preventDefault(); }
+      if (e.key === 'ArrowLeft') { glideBy(-1); e.preventDefault(); }
+    });
+
+    topicSlider.addEventListener('mouseenter', function () { hoverPause = true; });
+    topicSlider.addEventListener('mouseleave', function () { hoverPause = false; });
+    topicSlider.addEventListener('focusin', function () { focusPause = true; });
+    topicSlider.addEventListener('focusout', function (e) {
+      if (!topicSlider.contains(e.relatedTarget)) focusPause = false;
+    });
+
+    // Drag / swipe
+    var dragStartX = 0;
+    var dragStartOffset = 0;
+    topicTrack.addEventListener('pointerdown', function (e) {
+      if (e.button !== 0) return;
+      dragging = true;
+      glide = null;
+      dragStartX = e.clientX;
+      dragStartOffset = offset;
+      topicTrack.classList.add('is-dragging');
+      topicTrack.setPointerCapture(e.pointerId);
+    });
+    topicTrack.addEventListener('pointermove', function (e) {
+      if (!dragging) return;
+      offset = wrap(dragStartOffset - (e.clientX - dragStartX));
+      render();
+    });
+    var endDrag = function () {
+      if (!dragging) return;
+      dragging = false;
+      topicTrack.classList.remove('is-dragging');
+    };
+    topicTrack.addEventListener('pointerup', endDrag);
+    topicTrack.addEventListener('pointercancel', endDrag);
+
+    if ('IntersectionObserver' in window) {
+      new IntersectionObserver(function (entries) {
+        visible = entries[0].isIntersecting;
+      }).observe(topicTrack);
+    }
+    window.addEventListener('resize', function () { offset = wrap(offset); render(); });
   }
 
   /* ---------- Rotating question headline in the problem section ---------- */
