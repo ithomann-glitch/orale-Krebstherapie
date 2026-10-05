@@ -556,8 +556,6 @@ img { max-width: 100%; display: block; }
   align-items: center;
   gap: 12px 18px;
 }
-.zg-phone { display: inline-flex; align-items: center; gap: 6px; font-weight: 700; color: var(--avocado); white-space: nowrap; }
-.zg-phone:hover { color: var(--erdbeere); }
 
 .vertrauen-lead { font-size: .95rem; margin-bottom: 14px; }
 
