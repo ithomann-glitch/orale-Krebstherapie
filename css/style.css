@@ -336,35 +336,8 @@ img { max-width: 100%; display: block; }
 .hero-trust a { text-decoration: underline; text-decoration-color: rgba(19,106,33,.35); text-underline-offset: 3px; }
 .hero-trust a:hover { text-decoration-color: currentColor; }
 
-/* ---------- Problem section ---------- */
-.problem { background: #fff; }
-
-.problem-intro {
-  margin-bottom: 28px;
-  text-align: center;
-}
-.problem-copy .section-sub { margin: 0 auto 22px; }
-.problem-question {
-  font-size: clamp(1.7rem, 3.2vw, 2.4rem);
-  line-height: 1.22;
-}
-.problem-question-highlight {
-  display: inline-block;
-  color: var(--erdbeere);
-  margin-top: 4px;
-  min-height: 1.22em;
-  transition: opacity .3s ease, transform .3s ease;
-}
-.problem-question-highlight.is-fading {
-  opacity: 0;
-  transform: translateY(6px);
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .problem-question-highlight {
-    transition: none;
-  }
-}
+/* ---------- Beratung ---------- */
+.beratung { background: #fff; }
 
 .leistung-grid {
   display: grid;
@@ -413,7 +386,7 @@ img { max-width: 100%; display: block; }
 
 /* ---------- Nebenwirkungen ---------- */
 /* ---------- Nutzen / "Was viele nicht wissen" ---------- */
-.insight { background: var(--morgentau); }
+.insight { background: var(--honigmelone); }
 .insight-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);

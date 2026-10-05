@@ -238,27 +238,6 @@
     window.addEventListener('resize', function () { offset = wrap(offset); render(); });
   }
 
-  /* ---------- Rotating question headline in the problem section ---------- */
-  var problemSlider = document.getElementById('problem-slider');
-  var reducedMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  if (problemSlider && !reducedMotion) {
-    var sliderQuestions = [
-      'Liegt es vielleicht an der Einnahme?',
-      'Verträgt sich das mit meinen anderen Tabletten?',
-      'Darf ich Vitamintabletten dazu nehmen?',
-      'Was, wenn ich eine Dosis vergessen habe?'
-    ];
-    var sliderIndex = 0;
-    setInterval(function () {
-      sliderIndex = (sliderIndex + 1) % sliderQuestions.length;
-      problemSlider.classList.add('is-fading');
-      setTimeout(function () {
-        problemSlider.textContent = sliderQuestions[sliderIndex];
-        problemSlider.classList.remove('is-fading');
-      }, 300);
-    }, 3200);
-  }
-
   /* ---------- Site navigation (scrollspy) ---------- */
   if (siteNav) {
     var siteNavLinks = Array.prototype.slice.call(siteNav.querySelectorAll('a'));
